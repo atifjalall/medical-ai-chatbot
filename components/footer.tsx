@@ -12,8 +12,7 @@ export function FooterText({ className, ...props }: React.ComponentProps<'p'>) {
       )}
       {...props}
     >
-      This is an AI observation only, not a medical diagnosis. Any concerning
-      findings should be evaluated by a healthcare professional.
+      Any concerning findings should be evaluated by a healthcare professional.
       {/* <ExternalLink href="https://cloud.google.com/vertex-ai">
         Twitter
       </ExternalLink>
