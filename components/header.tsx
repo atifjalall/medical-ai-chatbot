@@ -42,20 +42,19 @@ export async function Header() {
           <UserOrLogin />
         </React.Suspense>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center space-x-2">
+        <ThemeToggle /> {/* Add ThemeToggle here */}
         {session?.user ? (
           <UserMenu user={session.user} />
         ) : (
-          <>
-            <Button asChild size="lg" variant="ghost">
-              <span>
-                <IconUser />
-                <Link href="/login" className="ml-2">
-                  Login
-                </Link>
-              </span>
-            </Button>
-          </>
+          <Button asChild size="default" variant="ghost">
+            <span>
+              <IconUser />
+              <Link href="/login" className="ml-2">
+                Login
+              </Link>
+            </span>
+          </Button>
         )}
       </div>
     </header>

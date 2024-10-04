@@ -141,16 +141,16 @@ export function PromptForm({
             }
           }}
         />
-        <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-zinc-100 px-12 sm:rounded-full sm:px-12">
+        <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-zinc-100 dark:bg-zinc-800 px-12 sm:rounded-full sm:px-12">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="outline"
                 size="icon"
-                className="absolute left-4 top-[14px] size-8 rounded-full bg-background p-0 sm:left-4"
+                className="absolute left-4 top-[14px] size-8 rounded-full bg-background dark:bg-zinc-700 p-0 sm:left-4"
                 onClick={() => fileRef.current?.click()}
               >
-                <IconPlus />
+                <IconPlus className="text-zinc-900 dark:text-zinc-100" />
                 <span className="sr-only">Upload Image</span>
               </Button>
             </TooltipTrigger>
@@ -165,7 +165,7 @@ export function PromptForm({
                 ? 'Describe the uploaded image or ask a question...'
                 : 'Describe your symptoms or ask a medical question...'
             }
-            className="min-h-[60px] w-full bg-transparent placeholder:text-zinc-900 resize-none px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
+            className="min-h-[60px] w-full bg-transparent placeholder:text-zinc-900 dark:placeholder:text-zinc-300 resize-none px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
             autoFocus
             spellCheck={false}
             autoComplete="off"
@@ -182,7 +182,7 @@ export function PromptForm({
                   type="submit"
                   size="icon"
                   disabled={!uploadedImage && input === ''}
-                  className="bg-transparent shadow-none text-zinc-950 rounded-full hover:bg-zinc-200"
+                  className="bg-transparent shadow-none text-zinc-950 dark:text-zinc-100 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
                 >
                   <IconArrowElbow />
                   <span className="sr-only">Send message</span>

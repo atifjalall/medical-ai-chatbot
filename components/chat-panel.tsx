@@ -100,15 +100,14 @@ export function ChatPanel({
     }
   ]
 
-  function getRandomQuestions() {
+  // Use React's useState to select random questions only once when the component mounts
+  const [randomQuestions] = React.useState(() => {
     const shuffled = [...exampleMessages].sort(() => 0.5 - Math.random())
     return shuffled.slice(0, 2)
-  }
-
-  const randomQuestions = getRandomQuestions()
+  })
 
   return (
-    <div className="fixed inset-x-0 bg-white/90 bottom-0 w-full duration-300 ease-in-out peer-[[data-state=open]]:group-[]:lg:pl-[250px] peer-[[data-state=open]]:group-[]:xl:pl-[300px] dark:from-10%">
+    <div className="fixed inset-x-0 bg-white/90 dark:bg-zinc-950/90 bottom-0 w-full duration-300 ease-in-out peer-[[data-state=open]]:group-[]:lg:pl-[250px] peer-[[data-state=open]]:group-[]:xl:pl-[300px]">
       <ButtonScrollToBottom
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
@@ -121,7 +120,7 @@ export function ChatPanel({
               <div
                 key={example.heading}
                 className={cn(
-                  'cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors',
+                  'cursor-pointer bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-zinc-100 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors',
                   index > 1 && 'hidden md:block'
                 )}
                 onClick={async () => {
@@ -144,7 +143,7 @@ export function ChatPanel({
                     ])
                   } catch {
                     toast(
-                      <div className="text-red-600">
+                      <div className="text-red-600 dark:text-red-400">
                         You have reached your message limit! Please try again
                         later, or{' '}
                         <a
@@ -162,7 +161,7 @@ export function ChatPanel({
                 }}
               >
                 <div className="font-medium">{example.heading}</div>
-                <div className="text-sm text-zinc-800">
+                <div className="text-sm text-zinc-800 dark:text-zinc-300">
                   {example.subheading}
                 </div>
               </div>

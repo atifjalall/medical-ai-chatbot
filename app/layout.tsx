@@ -4,7 +4,7 @@ import { Analytics } from '@vercel/analytics/react'
 import '@/app/globals.css'
 import { cn } from '@/lib/utils'
 import { TailwindIndicator } from '@/components/tailwind-indicator'
-import { Providers } from '@/components/providers'
+import { Providers } from './providers'
 import { Header } from '@/components/header'
 import { Toaster } from '@/components/ui/sonner'
 import { KasadaClient } from '@/lib/kasada/kasada-client'
@@ -12,8 +12,8 @@ import { KasadaClient } from '@/lib/kasada/kasada-client'
 export const metadata = {
   metadataBase: new URL('https://gemini.vercel.ai'),
   title: {
-    default: 'Next.js Gemini Chatbot',
-    template: `%s - Next.js Gemini Chatbot`
+    default: 'Medical AI Chatbot',
+    template: `%s - Medical AI Chatbot`
   },
   description:
     'Build your own generative UI chatbot using the Vercel AI SDK and Google Gemini',
@@ -45,14 +45,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
           GeistMono.variable
         )}
       >
-        <KasadaClient />
-        <Toaster position="top-center" />
         <Providers
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <KasadaClient />
+          <Toaster position="top-center" />
           <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex flex-col flex-1">{children}</main>
