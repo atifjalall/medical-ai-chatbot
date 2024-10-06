@@ -38,19 +38,76 @@ export function ChatPanel({
 
   const exampleMessages = [
     {
-      heading: 'List flights flying from',
-      subheading: 'San Francisco to Rome today',
-      message: `List flights flying from San Francisco to Rome today`
+      heading: 'Evaluate chest pain symptoms',
+      subheading: 'Provide potential causes and next steps',
+      message:
+        'What could be causing chest pain, and when should I seek immediate medical attention?'
     },
     {
-      heading: 'What is the status',
-      subheading: 'of flight BA142?',
-      message: 'What is the status of flight BA142?'
+      heading: 'Analyze X-ray image',
+      subheading: 'Provide observations on a chest X-ray',
+      message:
+        'Please analyze this chest X-ray and describe any notable findings.'
+    },
+    {
+      heading: 'Evaluate skin rash',
+      subheading: 'Provide potential causes and treatments for a skin rash',
+      message:
+        'What could be causing a skin rash, and what are some common treatments?'
+    },
+    {
+      heading: 'Assess headache symptoms',
+      subheading: 'Provide potential causes and treatments for headaches',
+      message:
+        'What are some common causes of headaches, and how can they be managed?'
+    },
+    {
+      heading: 'Review symptoms of fever',
+      subheading: 'Analyze possible causes of a fever',
+      message: 'What could be causing a fever, and when should I seek help?'
+    },
+    {
+      heading: 'Analyze stomach pain',
+      subheading: 'Provide potential causes of stomach pain',
+      message:
+        'What could be causing stomach pain, and when should I be concerned?'
+    },
+    {
+      heading: 'Evaluate cough symptoms',
+      subheading:
+        'Provide possible causes and treatments for a persistent cough',
+      message:
+        'What are some common causes of a persistent cough, and how can it be treated?'
+    },
+    {
+      heading: 'Review joint pain symptoms',
+      subheading: 'Provide possible causes and treatments for joint pain',
+      message:
+        'What could be causing joint pain, and when should I seek medical attention?'
+    },
+    {
+      heading: 'Assess dizziness symptoms',
+      subheading: 'Provide possible causes and next steps for dizziness',
+      message:
+        'What could be causing dizziness, and when should I see a doctor?'
+    },
+    {
+      heading: 'Analyze breathing difficulties',
+      subheading:
+        'Provide potential causes and next steps for shortness of breath',
+      message:
+        'What could be causing shortness of breath, and when should I seek emergency care?'
     }
   ]
 
+  // Use React's useState to select random questions only once when the component mounts
+  const [randomQuestions] = React.useState(() => {
+    const shuffled = [...exampleMessages].sort(() => 0.5 - Math.random())
+    return shuffled.slice(0, 2)
+  })
+
   return (
-    <div className="fixed inset-x-0 bg-white/90 bottom-0 w-full duration-300 ease-in-out peer-[[data-state=open]]:group-[]:lg:pl-[250px] peer-[[data-state=open]]:group-[]:xl:pl-[300px] dark:from-10%">
+    <div className="fixed inset-x-0 bg-white/90 dark:bg-zinc-950/90 bottom-0 w-full duration-300 ease-in-out peer-[[data-state=open]]:group-[]:lg:pl-[250px] peer-[[data-state=open]]:group-[]:xl:pl-[300px]">
       <ButtonScrollToBottom
         isAtBottom={isAtBottom}
         scrollToBottom={scrollToBottom}
@@ -59,11 +116,11 @@ export function ChatPanel({
       <div className="mx-auto sm:max-w-2xl sm:px-4">
         <div className="mb-4 grid sm:grid-cols-2 gap-2 sm:gap-4 px-4 sm:px-0">
           {messages.length === 0 &&
-            exampleMessages.map((example, index) => (
+            randomQuestions.map((example, index) => (
               <div
                 key={example.heading}
                 className={cn(
-                  'cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors',
+                  'cursor-pointer bg-zinc-50 dark:bg-zinc-800 text-zinc-950 dark:text-zinc-100 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors',
                   index > 1 && 'hidden md:block'
                 )}
                 onClick={async () => {
@@ -86,7 +143,7 @@ export function ChatPanel({
                     ])
                   } catch {
                     toast(
-                      <div className="text-red-600">
+                      <div className="text-red-600 dark:text-red-400">
                         You have reached your message limit! Please try again
                         later, or{' '}
                         <a
@@ -104,7 +161,7 @@ export function ChatPanel({
                 }}
               >
                 <div className="font-medium">{example.heading}</div>
-                <div className="text-sm text-zinc-800">
+                <div className="text-sm text-zinc-800 dark:text-zinc-300">
                   {example.subheading}
                 </div>
               </div>
