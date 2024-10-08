@@ -1,35 +1,36 @@
-'use client'
+'use client';
 
-import { useFormState, useFormStatus } from 'react-dom'
-import { authenticate } from '@/app/login/actions'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
-import { IconSpinner } from './ui/icons'
-import { getMessageFromCode } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useFormState, useFormStatus } from 'react-dom';
+import { authenticate } from '@/app/login/actions';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
+import { IconSpinner } from './ui/icons';
+import { getMessageFromCode } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
+import { FcGoogle } from 'react-icons/fc'; // Import the Google icon
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [result, dispatch] = useFormState(authenticate, undefined)
+  const router = useRouter();
+  const [result, dispatch] = useFormState(authenticate, undefined);
 
   useEffect(() => {
     if (result) {
       if (result.type === 'error') {
-        toast.error(getMessageFromCode(result.resultCode))
+        toast.error(getMessageFromCode(result.resultCode));
       } else {
-        toast.success(getMessageFromCode(result.resultCode))
-        router.refresh()
+        toast.success(getMessageFromCode(result.resultCode));
+        router.refresh();
       }
     }
-  }, [result, router])
+  }, [result, router]);
 
   return (
     <form
       action={dispatch}
       className="flex flex-col items-center gap-4 space-y-3"
     >
-      <div className="w-full flex-1 rounded-xl border bg-white px-6 pb-4 pt-8 shadow-md  md:w-96 dark:bg-zinc-950">
+      <div className="w-full flex-1 rounded-xl border bg-white px-6 pb-4 pt-8 shadow-md md:w-96 dark:bg-zinc-950">
         <h1 className="mb-3 text-2xl font-bold">Please log in to continue.</h1>
         <div className="w-full">
           <div>
@@ -71,6 +72,20 @@ export default function LoginForm() {
           </div>
         </div>
         <LoginButton />
+
+        {/* Forgot Password Link */}
+        <Link href="/forgot-password" className="text-sm text-zinc-400">
+          Forgot Password?
+        </Link>
+
+        {/* Separator */}
+        <div className="my-4 border-t border-zinc-300 w-full" />
+
+        {/* Google Login Button */}
+        <button className="flex h-10 w-full items-center justify-center rounded-lg border bg-white shadow-md hover:bg-gray-100">
+          <FcGoogle className="h-5 w-5 mr-2" /> {/* Google Icon */}
+          <span className="text-sm font-semibold text-zinc-800">Continue with Google</span>
+        </button>
       </div>
 
       <Link
@@ -80,11 +95,11 @@ export default function LoginForm() {
         No account yet? <div className="font-semibold underline">Sign up</div>
       </Link>
     </form>
-  )
+  );
 }
 
 function LoginButton() {
-  const { pending } = useFormStatus()
+  const { pending } = useFormStatus();
 
   return (
     <button
@@ -93,5 +108,5 @@ function LoginButton() {
     >
       {pending ? <IconSpinner /> : 'Log in'}
     </button>
-  )
+  );
 }

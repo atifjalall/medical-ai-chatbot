@@ -1,12 +1,25 @@
-
-import { Session } from '@/lib/types'
+import { Session, User } from '@/lib/types'; // Ensure the User type includes all necessary fields
+import { getUser } from '../app/login/actions'; // Import the getUser function
+import { useEffect, useState } from 'react'; // Import useEffect and useState
 
 export interface EmptyScreenProps {
-  user?: Session['user'] // Make user optional
+  user?: Session['user']; // Make user optional
 }
 
 export function EmptyScreen({ user }: EmptyScreenProps) {
-  console.log("EmptyScreen user:", user);
+  const [fetchedUser, setFetchedUser] = useState<User | null>(null); // State to hold fetched user
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user?.email) {
+        const fetchedData = await getUser(user.email); // Fetch user data
+        setFetchedUser(fetchedData); // Set the fetched user data
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
   return (
     <div className="fixed inset-0 flex justify-center items-center">
       <div className="mx-auto max-w-2xl px-4 -mt-32">
@@ -15,10 +28,10 @@ export function EmptyScreen({ user }: EmptyScreenProps) {
             className="text-4xl sm:text-5xl tracking-tight font-semibold whitespace-nowrap
                        bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text"
           >
-            Hello, {user?.email || 'Guest'}
+            Hello, {fetchedUser?.firstName || 'Guest'} 
           </h1>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -7,10 +7,36 @@ import { z } from 'zod'
 import { kv } from '@vercel/kv'
 import { ResultCode } from '@/lib/utils'
 
-export async function getUser(email: string) {
-  const user = await kv.hgetall<User>(`user:${email}`)
-  return user
+
+import clientPromise from '@/lib/mongodb'; // Import your MongoDB client
+import { ObjectId } from 'mongodb'; // Import ObjectId to handle MongoDB IDs
+
+export async function getUser(email: string): Promise<User | null> {
+  try {
+    const client = await clientPromise; // Get MongoDB client
+    const db = client.db('medicalChatbotDB'); // Use your actual database name
+    
+    // Find the user by email
+    const user = await db.collection('users').findOne({ email });
+
+    // If the user is found, map the fields to the User type
+    if (user) {
+      return {
+        id: user._id.toString(), // Convert ObjectId to string
+        email: user.email,
+        password: user.password,
+        salt: user.salt,
+        firstName: user.firstName,
+      } as User; // Cast to User type
+    }
+
+    return null; // Return null if user is not found
+  } catch (error) {
+    console.error('Error retrieving user:', error);
+    return null; // Handle error gracefully
+  }
 }
+
 
 interface Result {
   type: string
