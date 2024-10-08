@@ -12,12 +12,17 @@ import remarkMath from 'remark-math'
 import { StreamableValue } from 'ai/rsc'
 import { useStreamableText } from '@/lib/hooks/use-streamable-text'
 
+// Declare a single variable for icon size
+const iconSize = 'w-6 h-6' // Adjust this size later if needed
+
 // Different types of message bubbles.
 
 export function UserMessage({ children }: { children: React.ReactNode }) {
   return (
     <div className="group relative flex items-start md:-ml-12">
-      <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm">
+      <div
+        className={`bg-background flex ${iconSize} shrink-0 select-none items-center justify-center rounded-lg shadow-sm`}
+      >
         <IconUser />
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden pl-2">
@@ -38,8 +43,10 @@ export function BotMessage({
 
   return (
     <div className={cn('group relative flex items-start md:-ml-12', className)}>
-      <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm">
-        <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
+      <div
+        className={`bg-background flex ${iconSize} shrink-0 select-none items-center justify-center rounded-lg shadow-sm`}
+      >
+        <img className={iconSize} src="/images/gemini.png" alt="gemini logo" />
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
         <MemoizedReactMarkdown
@@ -99,11 +106,11 @@ export function BotCard({
     <div className="group relative flex items-start md:-ml-12">
       <div
         className={cn(
-          'bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm',
+          `bg-background flex ${iconSize} shrink-0 select-none items-center justify-center rounded-lg shadow-sm`,
           !showAvatar && 'invisible'
         )}
       >
-        <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
+        <img className={iconSize} src="/images/gemini.png" alt="gemini logo" />
       </div>
       <div className="ml-4 flex-1 pl-2">{children}</div>
     </div>
@@ -125,12 +132,15 @@ export function SystemMessage({ children }: { children: React.ReactNode }) {
 export function SpinnerMessage() {
   return (
     <div className="group relative flex items-start md:-ml-12">
-      <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm">
-        <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
+      <div className={`bg-background flex ${iconSize} shrink-0 select-none items-center justify-center rounded-lg shadow-sm`}>
+        <img className={iconSize} src="/images/gemini.png" alt="gemini logo" />
       </div>
-      <div className="ml-4 h-[24px] flex flex-row items-center flex-1 space-y-2 overflow-hidden px-1">
-        {spinner}
+      <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
+        <div className="w-full h-4 rounded-full skeleton-gradient animate-gradient"></div> {/* Full-width line */}
+        <div className="w-full h-4 rounded-full skeleton-gradient animate-gradient"></div> {/* Full-width line */}
+        <div className="w-1/2 h-4 rounded-full skeleton-gradient animate-gradient"></div> {/* Half-width line */}
       </div>
     </div>
   )
 }
+

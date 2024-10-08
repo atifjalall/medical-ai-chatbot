@@ -57,21 +57,42 @@ export default function SignupForm() {
       <div className="w-full flex-1 rounded-xl border bg-white px-6 pb-4 pt-8 shadow-md md:w-96 dark:bg-zinc-950">
         <h1 className="mb-3 text-2xl font-bold">Sign up for an account!</h1>
         <div className="w-full">
-          {/* Name Field */}
+          {/* First Name Field */}
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-zinc-400"
-              htmlFor="name"
+              htmlFor="firstName"
             >
-              Name
+              First Name
             </label>
             <div className="relative">
               <input
                 className="peer block w-full rounded-lg border bg-zinc-50 px-2 py-[9px] text-sm outline-none placeholder:text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950"
-                id="name"
+                id="firstName"
                 type="text"
-                name="name"
-                placeholder="Enter your name"
+                name="firstName"
+                placeholder="Enter your first name"
+                required
+                maxLength={50}
+              />
+            </div>
+          </div>
+
+          {/* Last Name Field */}
+          <div className="mt-4">
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-zinc-400"
+              htmlFor="lastName"
+            >
+              Last Name
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-lg border bg-zinc-50 px-2 py-[9px] text-sm outline-none placeholder:text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950"
+                id="lastName"
+                type="text"
+                name="lastName"
+                placeholder="Enter your last name"
                 required
                 maxLength={50}
               />
