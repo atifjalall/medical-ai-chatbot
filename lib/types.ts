@@ -35,3 +35,15 @@ export interface User extends Record<string, any> {
   password: string
   salt: string
 }
+
+export interface User {
+  id: string;        // The user's ID as a string
+  email: string;     // The user's email address
+  password: string;  // The user's password (optional for client-side usage)
+  salt: string;      // The salt used for password hashing
+  firstName: string; // The user's first name
+  lastName: string;  // The user's last name
+  dob: string;       // The user's date of birth (consider using Date type if you want to manipulate dates)
+  gender: string;    // The user's gender
+}
+

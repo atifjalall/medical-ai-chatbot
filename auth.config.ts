@@ -1,6 +1,7 @@
-import type { NextAuthConfig } from 'next-auth'
+import type { NextAuthConfig } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials'; 
 
-export const authConfig = {
+export const authConfig: NextAuthConfig = {
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/login',
@@ -8,35 +9,37 @@ export const authConfig = {
   },
   callbacks: {
     async authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isOnLoginPage = nextUrl.pathname.startsWith('/login')
-      const isOnSignupPage = nextUrl.pathname.startsWith('/signup')
+      const isLoggedIn = !!auth?.user;
+      const isOnLoginPage = nextUrl.pathname.startsWith('/login');
+      const isOnSignupPage = nextUrl.pathname.startsWith('/signup');
 
       if (isLoggedIn) {
         if (isOnLoginPage || isOnSignupPage) {
-          return Response.redirect(new URL('/', nextUrl))
+          return Response.redirect(new URL('/', nextUrl));
         }
       }
 
-      return true
+      return true;
     },
     async jwt({ token, user }) {
       if (user) {
-        token = { ...token, id: user.id }
+        token = { ...token, id: user.id };
       }
 
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (token) {
-        const { id } = token as { id: string }
-        const { user } = session
+        const { id } = token as { id: string };
+        const { user } = session;
 
-        session = { ...session, user: { ...user, id } }
+        session = { ...session, user: { ...user, id } };
       }
 
-      return session
-    }
+      return session;
+    },
   },
-  providers: []
-} satisfies NextAuthConfig
+  providers: [
+    Credentials({ /* You can also define options here if needed */ }),
+  ],
+};
