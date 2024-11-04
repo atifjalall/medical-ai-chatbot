@@ -6,23 +6,27 @@ import clientPromise from '@/lib/mongodb'
 import { auth } from '@/auth'
 import { type Chat, type Message, type MessageAttachment } from '@/lib/types'
 
-// Helper function to process attachments safely
-function processAttachment(attachment: MessageAttachment): MessageAttachment {
-  return {
-    type: 'image',
-    data: attachment.data,
-    mimeType: attachment.mimeType,
-    analysisId: attachment.analysisId
-  }
+// Helper function to process images within messages
+function processImageAttachments(attachments?: MessageAttachment[]): MessageAttachment[] | undefined {
+  if (!attachments) return undefined;
+  
+  return attachments.map(attachment => {
+    if (attachment.type === 'image') {
+      return {
+        type: 'image',
+        data: attachment.data,
+        mimeType: attachment.mimeType || 'image/jpeg'
+      }
+    }
+    return attachment;
+  });
 }
 
-// Helper function to process messages safely
+// Helper function to process a message with its attachments
 function processMessage(msg: Message): Message {
   return {
     ...msg,
-    attachments: msg.attachments 
-      ? msg.attachments.map(processAttachment)
-      : undefined,
+    attachments: processImageAttachments(msg.attachments),
     metadata: {
       ...msg.metadata,
       timestamp: msg.metadata?.timestamp || new Date().toISOString()
@@ -120,43 +124,39 @@ export async function saveChat(chat: Chat) {
       .collection<Chat>('chats')
       .findOne({ id: chat.id })
 
-    // Process and consolidate messages
+    // Process messages and their attachments
     const processedMessages = chat.messages.map(processMessage)
-    const consolidatedNewMessages = consolidateMessages(processedMessages)
+    const consolidatedMessages = consolidateMessages(processedMessages)
 
     if (existingChat) {
-      // Get only new messages
       const existingMessageIds = new Set(existingChat.messages.map(m => m.id))
-      const newMessages = consolidatedNewMessages.filter(
+      const newMessages = consolidatedMessages.filter(
         msg => !existingMessageIds.has(msg.id)
       )
 
       if (newMessages.length > 0) {
-        const updateOperation = {
-          $set: {
-            title: chat.title,
-            path: chat.path,
-            updatedAt: new Date(),
-            sharePath: chat.sharePath,
-            imageData: chat.imageData
-          },
-          $push: {
-            messages: {
-              $each: newMessages
-            }
-          } as any
-        }
-
         await db.collection<Chat>('chats').updateOne(
           { id: chat.id },
-          updateOperation
+          {
+            $set: {
+              title: chat.title,
+              path: chat.path,
+              updatedAt: new Date(),
+              sharePath: chat.sharePath,
+              imageData: chat.imageData
+            },
+            $push: {
+              messages: {
+                $each: newMessages
+              }
+            } as any
+          }
         )
       }
     } else {
-      // Create new chat
       await db.collection<Chat>('chats').insertOne({
         ...chat,
-        messages: consolidatedNewMessages,
+        messages: consolidatedMessages,
         createdAt: new Date(),
         updatedAt: new Date()
       })
