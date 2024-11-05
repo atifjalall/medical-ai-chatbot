@@ -4,9 +4,11 @@ import { useActions, useUIState } from 'ai/rsc'
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
-import { IconArrowElbow, IconPlus } from '@/components/ui/icons'
-import { BiSolidSend, BiImageAdd } from 'react-icons/bi'
+import SendRoundedIcon from '@mui/icons-material/SendRounded'
+import AddPhotoAlternateRoundedIcon from '@mui/icons-material/AddPhotoAlternateRounded'
+import EqualizerRoundedIcon from '@mui/icons-material/EqualizerRounded';
 import { FaTimes } from 'react-icons/fa'
+import { MdLiveHelp } from 'react-icons/md' // Live chat icon import
 import {
   Tooltip,
   TooltipContent,
@@ -120,100 +122,110 @@ export function PromptForm({
   }
 
   return (
-    <div className="relative">
-      <form ref={formRef} onSubmit={handleSubmit}>
-        <input
-          type="file"
-          className="hidden"
-          id="file"
-          accept="image/*"
-          ref={fileRef}
-          onChange={event => {
-            const file = event.target.files?.[0]
-            if (file) {
-              handleImageUpload(file)
-            }
-          }}
-        />
-        <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-zinc-100 dark:bg-zinc-800 px-12 sm:rounded-full sm:px-12">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute left-4 top-[14px] rounded-full bg-transparent border-none shadow-none hover:bg-zinc-200 dark:hover:bg-zinc-700 dark:border-none p-0 sm:left-4"
-                onClick={() => fileRef.current?.click()}
-                disabled={!!uploadedImage || isWaitingForResponse}
-              >
-                <BiImageAdd
-                  size={28}
-                  className="text-zinc-500 dark:text-zinc-400"
-                />
-                <span className="sr-only">Upload Image</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Upload Medical Image</TooltipContent>
-          </Tooltip>
-          <Textarea
-            ref={inputRef}
-            tabIndex={0}
-            onKeyDown={onKeyDown}
-            placeholder={
-              uploadedImage
-                ? 'Describe the uploaded image or ask a question...'
-                : 'Describe your symptoms or ask a medical question...'
-            }
-            className="min-h-[60px] w-full bg-transparent placeholder:text-zinc-900 dark:placeholder:text-zinc-300 resize-none px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
-            autoFocus
-            spellCheck={false}
-            autoComplete="off"
-            autoCorrect="off"
-            name="message"
-            rows={1}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            disabled={isWaitingForResponse}
+      <div className="relative">
+        <form ref={formRef} onSubmit={handleSubmit} className="relative">
+          <input
+            type="file"
+            className="hidden"
+            id="file"
+            accept="image/*"
+            ref={fileRef}
+            onChange={event => {
+              const file = event.target.files?.[0]
+              if (file) {
+                handleImageUpload(file)
+              }
+            }}
           />
-          {uploadedImage && (
-            <div className="absolute right-14 top-[14px] flex items-center">
-              <div className="relative">
-                <img
-                  src={uploadedImage}
-                  alt="Uploaded medical image"
-                  className="h-8 w-8 object-cover rounded-lg"
-                />
-                <button
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                  onClick={() => setUploadedImage(null)}
-                >
-                  <FaTimes className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          )}
-          <div className="absolute right-4 top-[13px] sm:right-4">
+          <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-zinc-100 dark:bg-zinc-800 px-12 sm:rounded-full sm:px-12">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  type="submit"
+                  variant="outline"
                   size="icon"
-                  disabled={
-                    (!uploadedImage && input === '') || isWaitingForResponse
-                  }
-                  className="bg-transparent shadow-none text-zinc-500 dark:text-zinc-400 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  className="absolute left-4 top-[14px] rounded-full bg-transparent border-none shadow-none hover:bg-zinc-200 dark:hover:bg-zinc-700 dark:border-none p-0 sm:left-4"
+                  onClick={() => fileRef.current?.click()}
+                  disabled={!!uploadedImage || isWaitingForResponse}
                 >
-                  <BiSolidSend
-                    size={28}
-                    className="text-zinc-500 dark:text-zinc-400"
-                  />
-                  <span className="sr-only">Send message</span>
+                  <AddPhotoAlternateRoundedIcon sx={{ fontSize: 28 }}/>
+                  <span className="sr-only">Upload Image</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Send message</TooltipContent>
+              <TooltipContent>Upload Medical Image</TooltipContent>
             </Tooltip>
+            <Textarea
+              ref={inputRef}
+              tabIndex={0}
+              onKeyDown={onKeyDown}
+              placeholder={
+                uploadedImage
+                  ? 'Describe the uploaded image or ask a question...'
+                  : 'Describe your symptoms or ask a medical question...'
+              }
+              className="min-h-[60px] w-full bg-transparent placeholder:text-zinc-900 dark:placeholder:text-zinc-300 resize-none px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
+              autoFocus
+              spellCheck={false}
+              autoComplete="off"
+              autoCorrect="off"
+              name="message"
+              rows={1}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              disabled={isWaitingForResponse}
+            />
+            {uploadedImage && (
+              <div className="absolute right-14 top-[14px] flex items-center">
+                <div className="relative">
+                  <img
+                    src={uploadedImage}
+                    alt="Uploaded medical image"
+                    className="size-8 object-cover rounded-lg"
+                  />
+                  <button
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    onClick={() => setUploadedImage(null)}
+                  >
+                    <FaTimes className="size-3" />
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className="absolute right-16 top-[13px] sm:right-4">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={
+                      (!uploadedImage && input === '') || isWaitingForResponse
+                    }
+                    className="bg-transparent shadow-none text-zinc-500 dark:text-zinc-400 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  >
+                    <SendRoundedIcon sx={{ fontSize: 28 }} />
+                    <span className="sr-only">Send message</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Send message</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
+        </form>
+        {/* Live Chat Button Aligned Further to the Right */}
+        <div className="absolute top-1/2 right-[-75px] -translate-y-1/2 h-full w-16 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 rounded-full">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                className="bg-transparent text-zinc-500 dark:text-zinc-400 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700"
+              >
+                <EqualizerRoundedIcon sx={{ fontSize: 28 }}/>
+                <span className="sr-only">Live Chat</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Live Chat</TooltipContent>
+          </Tooltip>
         </div>
-      </form>
-    </div>
-  )
+      </div>
+    )
 }
