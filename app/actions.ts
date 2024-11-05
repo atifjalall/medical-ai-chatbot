@@ -227,6 +227,8 @@ export async function clearChats() {
 }
 
 export async function getSharedChat(id: string) {
+  if (!id) return null;
+
   try {
     const client = await clientPromise
     const db = client.db()
@@ -240,9 +242,28 @@ export async function getSharedChat(id: string) {
       return null
     }
 
+    // Ensure all necessary fields exist and are properly formatted
     return {
-      ...chat,
-      messages: consolidateMessages(chat.messages)
+      id: chat.id,
+      title: chat.title || 'Shared Chat',
+      userId: chat.userId,
+      createdAt: chat.createdAt || new Date(),
+      updatedAt: chat.updatedAt || new Date(),
+      path: chat.path,
+      sharePath: chat.sharePath,
+      messages: chat.messages.map(message => ({
+        id: message.id,
+        role: message.role,
+        content: message.content,
+        metadata: {
+          timestamp: message.metadata?.timestamp || new Date().toISOString()
+        },
+        attachments: message.attachments?.map(att => ({
+          type: att.type,
+          data: att.data,
+          mimeType: att.mimeType || 'image/jpeg'
+        }))
+      }))
     }
   } catch (error) {
     console.error('Error fetching shared chat:', error)

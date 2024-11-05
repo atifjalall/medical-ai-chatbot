@@ -1,26 +1,32 @@
-// app/waiting-room/page.tsx
-import { Button } from '@/components/ui/button'
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function WaitingRoom() {
+  const router = useRouter()
+  const [countdown, setCountdown] = useState(60)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          router.push('/')
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [router])
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-lg">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
-            Rate Limit Exceeded
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Please wait a moment before making more requests.
-          </p>
-        </div>
-        <div className="mt-8 space-y-6">
-          <Button
-            className="w-full"
-            onClick={() => window.location.href = '/'}
-          >
-            Try Again
-          </Button>
-        </div>
+    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="text-center space-y-4">
+        <h1 className="text-2xl font-bold">Rate Limit Exceeded</h1>
+        <p>Please wait {countdown} seconds before trying again.</p>
       </div>
     </div>
   )

@@ -1,14 +1,11 @@
 import { type Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
-
+import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 import { getSharedChat } from '@/app/actions'
 import { ChatList } from '@/components/chat-list'
 import { FooterText } from '@/components/footer'
-import { AI, UIState, getUIStateFromAIState } from '@/lib/chat/actions'
-
-export const runtime = 'edge'
-export const preferredRegion = 'home'
+import { AI } from '@/lib/chat/actions'
+import { MessageComponent } from '@/components/client-message'
 
 interface SharePageProps {
   params: {
@@ -22,8 +19,21 @@ export async function generateMetadata({
   const chat = await getSharedChat(params.id)
 
   return {
-    title: chat?.title.slice(0, 50) ?? 'Chat'
+    title: chat?.title.slice(0, 50) ?? 'Shared Chat'
   }
+}
+
+function getUIStateFromMessages(chat: any) {
+  return chat.messages.map((message: any, index: number) => ({
+    id: `${chat.id}-${index}`,
+    display: (
+      <MessageComponent 
+        role={message.role}
+        content={message.content}
+        attachments={message.attachments}
+      />
+    )
+  }))
 }
 
 export default async function SharePage({ params }: SharePageProps) {
@@ -33,7 +43,7 @@ export default async function SharePage({ params }: SharePageProps) {
     notFound()
   }
 
-  const uiState: UIState = getUIStateFromAIState(chat)
+  const uiState = getUIStateFromMessages(chat)
 
   return (
     <>
@@ -48,7 +58,11 @@ export default async function SharePage({ params }: SharePageProps) {
             </div>
           </div>
         </div>
-        <AI>
+        <AI initialAIState={{ 
+          chatId: chat.id,
+          messages: chat.messages,
+          interactions: []
+        }}>
           <ChatList messages={uiState} isShared={true} />
         </AI>
       </div>

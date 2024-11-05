@@ -154,3 +154,45 @@ export interface ChatValidation {
   isValid: boolean
   errors?: string[]
 }
+
+export interface SharedChat {
+  id: string
+  title: string
+  userId: string
+  createdAt: Date
+  updatedAt: Date
+  path: string
+  sharePath: string
+  messages: {
+    id: string
+    role: 'user' | 'assistant' | 'system'
+    content: string
+    metadata?: {
+      timestamp: string
+    }
+    attachments?: Array<{
+      type: 'image'
+      data: string
+      mimeType: string
+    }>
+  }[]
+}
+
+export interface SharedMessage {
+  id: string
+  role: 'user' | 'assistant' | 'system'
+  content: string
+  metadata?: {
+    timestamp: string
+  }
+  attachments?: Array<{
+    type: 'image'
+    data: string
+    mimeType: string
+  }>
+}
+
+export interface SharedChat extends Chat {
+  sharePath: string
+  messages: SharedMessage[]
+}
