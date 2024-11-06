@@ -15,7 +15,26 @@ export interface MessageMetadata {
   isEmergency?: boolean
   isEmergencyResponse?: boolean
   type?: 'image_analysis' | 'image_analysis_response' | 'text'
-  relatedToImage?: string
+  contextId?: string
+  topic?: string
+  isFollowUp?: boolean
+}
+
+export interface AIState {
+  chatId: string
+  interactions?: string[]
+  messages: Message[]
+  metadata?: {
+    lastEmergency?: string
+    totalInteractions?: number
+    sessionStartTime?: string
+    currentTopic?: string
+  }
+  context?: {
+    topic?: string
+    lastMessageId?: string
+    relatedMessages: string[]
+  }
 }
 
 // Extended Message type that includes our custom fields
@@ -46,16 +65,6 @@ export interface Chat extends Document {
 }
 
 // AI State for managing chat state
-export interface AIState {
-  chatId: string
-  interactions?: string[]
-  messages: Message[]
-  metadata?: {
-    lastEmergency?: string
-    totalInteractions?: number
-    sessionStartTime?: string
-  }
-}
 
 // UI State for React components
 export interface UIState {

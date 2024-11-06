@@ -20,7 +20,8 @@ import { streamText } from 'ai'
 import { google } from '@ai-sdk/google'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { rateLimit } from './ratelimit'
-
+import { contextStore } from '@/lib/stores/contextStore';
+import { ConversationAnalyzer } from '@/lib/utils/conversationAnalyzer';
 const genAI = new GoogleGenerativeAI(
   process.env.GOOGLE_GENERATIVE_AI_API_KEY || ''
 )
@@ -183,47 +184,51 @@ async function analyzeImage(imageBase64: string) {
   }
 }
 
+
 async function submitUserMessage(content: string) {
   'use server'
 
   await rateLimit()
 
   const aiState = getMutableAIState()
+  const chatId = aiState.get().chatId
   
-  // Get previous context
-  const previousMessages = aiState.get().messages
-  const lastAnalysis = previousMessages
-    .slice()
-    .reverse()
-    .find(msg => msg.metadata?.type === 'image_analysis_response')
+  // Get current context
+  let currentContext = contextStore.getContext(chatId);
+  
+  // Analyze the message
+  const isFollowUp = ConversationAnalyzer.isFollowUpQuestion(content, aiState.get().messages);
+  
+  // Update context if needed
+  if (ConversationAnalyzer.shouldUpdateContext(content, currentContext)) {
+    const newTopic = content;
+    currentContext = {
+      currentTopic: newTopic,
+      lastMessageId: nanoid(),
+      relatedMessages: [],
+      timestamp: new Date()
+    };
+    contextStore.setContext(chatId, currentContext);
+  }
 
-  // Create context for the AI
-  const contextualContent = lastAnalysis 
-    ? `Previous analysis: ${lastAnalysis.content}\n\nUser question: ${content}`
-    : content
+  // Create user message
+  const userMessage = {
+    id: nanoid(),
+    role: 'user',
+    content,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      contextId: currentContext?.lastMessageId,
+      isFollowUp,
+      topic: currentContext?.currentTopic
+    }
+  };
 
-  // Add user's new message
+  // Update state
   aiState.update({
     ...aiState.get(),
-    messages: [
-      ...aiState.get().messages,
-      {
-        id: nanoid(),
-        role: 'user',
-        content: content,
-        metadata: {
-          timestamp: new Date().toISOString()
-        }
-      }
-    ]
-  })
-
-  // Prepare message history with context
-  const history = aiState.get().messages.map(message => ({
-    role: message.role,
-    content: message.content,
-    metadata: message.metadata
-  }))
+    messages: [...aiState.get().messages, userMessage]
+  });
 
   const textStream = createStreamableValue('')
   const spinnerStream = createStreamableUI(<SpinnerMessage />)
@@ -232,40 +237,22 @@ async function submitUserMessage(content: string) {
 
   ;(async () => {
     try {
+      const systemPrompt = ConversationAnalyzer.buildSystemPrompt(content, currentContext);
+      
       const result = await streamText({
         model: google('models/gemini-1.5-flash'),
-        system: `\
-        You are Med AI, an AI medical assistant designed to help users with general medical queries and concerns.
-        
-        Context awareness:
-        - If responding to questions about a previously analyzed image, reference the image analysis when relevant
-        - Maintain context from previous messages when answering follow-up questions
-        
-        Key guidelines:
-        1. Never provide definitive diagnoses
-        2. Always recommend consulting healthcare professionals
-        3. Focus on general health information and educational content
-        4. Flag emergency symptoms immediately
-        5. Maintain medical privacy
-        6. Only provide evidence-based information
-        7. Clearly state you are an AI assistant
-        8. Don't write code
-        9. Only answer medical-related queries
-
-        If symptoms suggest an emergency, immediately recommend seeking urgent medical care.`,
+        system: systemPrompt,
         messages: [
-          // Include recent context
-          ...(lastAnalysis ? [{
-            role: 'assistant',
-            content: `Previous analysis: ${lastAnalysis.content}`
+          ...(currentContext?.currentTopic ? [{
+            role: 'system',
+            content: `The current topic is: ${currentContext.currentTopic}`
           }] : []),
-          // Current question
-          {
-            role: 'user',
-            content: contextualContent
-          }
+          ...aiState.get().messages.slice(-5).map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
         ]
-      })
+      });
 
       let textContent = ''
       spinnerStream.done(null)
@@ -275,20 +262,21 @@ async function submitUserMessage(content: string) {
           textContent += delta.textDelta
           messageStream.update(<BotMessage content={textContent} />)
 
+          const assistantMessage = {
+            id: nanoid(),
+            role: 'assistant',
+            content: textContent,
+            metadata: {
+              timestamp: new Date().toISOString(),
+              contextId: currentContext?.lastMessageId,
+              topic: currentContext?.currentTopic,
+              isFollowUp
+            }
+          }
+
           aiState.update({
             ...aiState.get(),
-            messages: [
-              ...aiState.get().messages,
-              {
-                id: nanoid(),
-                role: 'assistant',
-                content: textContent,
-                metadata: {
-                  timestamp: new Date().toISOString(),
-                  relatedToAnalysis: lastAnalysis?.id
-                }
-              }
-            ]
+            messages: [...aiState.get().messages, assistantMessage]
           })
         }
       }
@@ -298,13 +286,7 @@ async function submitUserMessage(content: string) {
       messageStream.done()
     } catch (e) {
       console.error(e)
-      const error = new Error(
-        'The AI got rate limited, please try again later.'
-      )
-      uiStream.error(error)
-      textStream.error(error)
-      messageStream.error(error)
-      aiState.done()
+      handleError(e, uiStream, textStream, messageStream, aiState)
     }
   })()
 
